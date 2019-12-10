@@ -1,16 +1,24 @@
 import sys
 
 try:
-    import time,subprocess,os,colors
-except:
-    process_display(1,1,"Module not found\n    Make sure you have installed 'requirements.txt' and configured DASH")
+    import time
+    import subprocess
+    import os
+    import colors
+except BaseException:
+    process_display(
+        1,
+        1,
+        "Module not found\n    Make sure you have installed 'requirements.txt' and configured DASH")
     sys.exit(0)
 
+
 def header():
-    print('\n\t\t{}-{} DASH {}-{}\n'.format(colors.red,colors.white,colors.red,colors.white))
+    print('\n\t\t{}-{} DASH {}-{}\n'.format(colors.red,
+                                            colors.white, colors.red, colors.white))
 
 
-def process_display(verbose,type,message):
+def process_display(verbose, type, message):
     if args.v is False:
         verbose = 0
 
@@ -24,55 +32,62 @@ def process_display(verbose,type,message):
         colors.info(message)
 
 
-def local(port,path):
-    local_process = subprocess.Popen(['python3 ./local.py -port {} -path {}'.format(port,path)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell = True)
+def local(port, path):
+    local_process = subprocess.Popen(['python3 ./local.py -port {} -path {}'.format(
+        port, path)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
 
     for output in local_process.stdout:
-        output=output.decode('utf-8')
+        output = output.decode('utf-8')
         if "Traceback" in output:
-            process_display(0,1,"Error due to usable port")
-            process_display(0,3,"Restarting with new port")
-            local(int(port)+1,path)
+            process_display(0, 1, "Error due to usable port")
+            process_display(0, 3, "Restarting with new port")
+            local(int(port) + 1, path)
         elif "Running" in output:
-            process_display(1,0,"[2/2] Local Server is started.")
+            process_display(1, 0, "[2/2] Local Server is started.")
             print("\n")
         elif "ClientIP" in output:
             ClientIP = output[10:]
         elif "127.0.0.1" in output:
             out = str(output).split(' ')
             if out[6] == '/':
-                process_display(0,0,"Someone Opened the page")
+                process_display(0, 0, "Someone Opened the page")
             elif out[-2] == '204':
-                process_display(0,0,"Upload Completed")
-
+                process_display(0, 0, "Upload Completed")
 
 
 def forward(port):
     try:
         import requests
         import json
-    except:
-        process_display(1,1,"Module not found\n    Make sure you have installed 'requirements.txt' and configured DASH")
+    except BaseException:
+        process_display(
+            1,
+            1,
+            "Module not found\n    Make sure you have installed 'requirements.txt' and configured DASH")
         sys.exit(0)
 
-    ngrok = subprocess.Popen(['ngrok','http','-region','ap' ,str(port)],stdout=subprocess.PIPE)
-    process_display(1,0,"[1/2] Public Server is started.")
+    ngrok = subprocess.Popen(
+        ['ngrok', 'http', '-region', 'ap', str(port)], stdout=subprocess.PIPE)
+    process_display(1, 0, "[1/2] Public Server is started.")
     time.sleep(3)
     tunnel_url = requests.get("http://localhost:4040/api/tunnels").text
     j = json.loads(tunnel_url)
     try:
         tunnel_url = j['tunnels'][0]['public_url']
-        process_display(0,0,"The link for the page is : "+tunnel_url)
+        process_display(0, 0, "The link for the page is : " + tunnel_url)
     except IndexError:
-        process_display(1,2,"Rechecking the URLs in 4s :/ ")
+        process_display(1, 2, "Rechecking the URLs in 4s :/ ")
         time.sleep(4)
         tunnel_url = requests.get("http://localhost:4040/api/tunnels").text
         j = json.loads(tunnel_url)
         tunnel_url = j['tunnels'][0]['public_url']
-        process_display(0,0,"The link for the page is : "+tunnel_url)
-    print("\n{}-------------------------------{} _^_ {}-------------------------------{}\n".format(colors.white,colors.red,colors.white,colors.red))
-
-
+        process_display(0, 0, "The link for the page is : " + tunnel_url)
+    print(
+        "\n{}-------------------------------{} _^_ {}-------------------------------{}\n".format(
+            colors.white,
+            colors.red,
+            colors.white,
+            colors.red))
 
 
 if __name__ == "__main__":
@@ -84,31 +99,50 @@ if __name__ == "__main__":
         try:
             import argparse
             parser = argparse.ArgumentParser()
-        except:
-            process_display(1,1,"Module not found\n    Make sure you have installed 'requirements.txt' and configured DASH")
+        except BaseException:
+            process_display(
+                1,
+                1,
+                "Module not found\n    Make sure you have installed 'requirements.txt' and configured DASH")
             sys.exit(0)
 
-        parser.add_argument('-port',help="Port address",required = False,default = 5050)
-        parser.add_argument('-path',help="Path to save file",required = False,default=os.path.expanduser('~')+'/Desktop')
-        parser.add_argument('-v',help="Verbose",default=False, action='store_true',required = False)
+        parser.add_argument(
+            '-port',
+            help="Port address",
+            required=False,
+            default=5050)
+        parser.add_argument(
+            '-path',
+            help="Path to save file",
+            required=False,
+            default=os.path.expanduser('~') +
+            '/Desktop')
+        parser.add_argument(
+            '-v',
+            help="Verbose",
+            default=False,
+            action='store_true',
+            required=False)
 
         args = parser.parse_args()
         try:
             import threading
-        except:
-            process_display(1,1,"Module not found\n    Make sure you have installed 'requirements.txt' and configured DASH")
+        except BaseException:
+            process_display(
+                1,
+                1,
+                "Module not found\n    Make sure you have installed 'requirements.txt' and configured DASH")
             sys.exit(0)
 
-        thread1 = threading.Thread(target=forward,args=(args.port,))
-        thread2 = threading.Thread(target=local,args=(args.port,args.path))
+        thread1 = threading.Thread(target=forward, args=(args.port,))
+        thread2 = threading.Thread(target=local, args=(args.port, args.path))
 
         thread1.start()
         time.sleep(1)
         thread2.start()
 
-
         thread1.join()
         thread2.join()
-    except:
+    except BaseException:
         print("\nYou're Great..!\nThanks for using :)")
         sys.exit(0)

@@ -11,7 +11,7 @@ lightgrey = '\033[37m'
 darkgrey = '\033[90m'
 lightred = '\033[91m'
 lightgreen = '\033[92m'
-white ='\033[1;37m'
+white = '\033[1;37m'
 yellow = '\033[93m'
 lightblue = '\033[94m'
 pink = '\033[95m'
@@ -19,9 +19,11 @@ lightcyan = '\033[96m'
 end = '\x1b[0m'
 
 # Used for printing error message on terminal
+
+
 def error(message):
     message = str(message)
-    initial =red + '[-] '
+    initial = red + '[-] '
 
     print(initial + end + message)
 
@@ -29,7 +31,7 @@ def error(message):
 # Used for printing success message on terminal
 def success(message):
     message = str(message)
-    initial = green+'[+] '
+    initial = green + '[+] '
 
     print(initial + end + message)
 
@@ -44,7 +46,7 @@ def info(message):
 
 # Used for printing process related updates on terminal
 def process(message):
-    message=str(message)
-    initial= white + '[~] '
+    message = str(message)
+    initial = white + '[~] '
 
     print(initial + end + message)

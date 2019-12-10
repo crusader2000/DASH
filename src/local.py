@@ -3,7 +3,7 @@ import sys
 try:
     import os
     from flask import Flask, render_template, request
-except:
+except BaseException:
     print("Module not found\n    Make sure you have installed 'requirements.txt' and configured DASH")
     sys.exit(0)
 
@@ -27,7 +27,7 @@ def upload():
         destination = "/".join([target, filename])
         print(destination)
         file.save(destination)
-    return '',204
+    return '', 204
 
 
 if __name__ == "__main__":
@@ -35,12 +35,12 @@ if __name__ == "__main__":
     try:
         import argparse
         parser = argparse.ArgumentParser()
-    except:
+    except BaseException:
         print("Module not found\n    Make sure you have installed 'requirements.txt' and configured DASH")
         sys.exit(0)
 
-    parser.add_argument('-port',help="Port address")
-    parser.add_argument('-path',help="Path address")
+    parser.add_argument('-port', help="Port address")
+    parser.add_argument('-path', help="Path address")
 
     args = parser.parse_args()
 
